@@ -1,0 +1,447 @@
+
+function checkTips() {
+	if ( !gmProperties.loaded ) return;
+	// Define if it's a free version or not
+	if ( gmProperties.clientId !== '-' ) {
+		// Business tips
+		myFreeversion(gmProperties,false);
+		// Release by default
+		if ( myGmproperties.others[v] && ( myGmproperties.others[v][myindexOf]('exp') > -1 ) ) {
+
+			// Detect experimental version
+			myDocverion(gmProperties,gmProperties.version.replace(/([0-9]*\.).*/g,'$1') + 'exp'); // Experimental version
+		} else myDocverion(gmProperties,gmProperties.version.replace(/([0-9]*\..*)\..*/g,'$1')); // Release or Frozen version
+	} else {
+		// Free tips
+		myFreeversion(gmProperties,true);
+		// Experimental by default
+		if ( !gmProperties.others.v ) {
+			myDocverion(gmProperties,gmProperties.version.replace(/([0-9]*\.).*/g,'$1') + 'exp'); // Experimental version
+		} else myDocverion(gmProperties,gmProperties.version.replace(/([0-9]*\..*)\..*/g,'$1')); // Release or Frozen version
+	}
+	if ( !gmProperties.haveInstance ) {
+		myGmtips[mypush]( createTips( chrome.i18n.getMessage( 'noUsage' ) ) );
+
+	} else {
+		// Check libraries
+		if ( myGmproperties[libraries][myindexOf]('places') > -1 ) {
+
+			if ( !gmProperties.placesInstantiate ) myGmtips[mypush]( createTips( chrome.i18n.getMessage( 'librairyNoUsage', ['places'] ) ) );
+
+		}
+		/*
+		Disable
+		if ( myGmproperties[libraries][myindexOf]('drawing') > -1 ) {
+
+			if ( !gmProperties.drawingInstantiate ) myGmtips[mypush]( createTips( '' ) );
+
+		} 
+		if ( myGmproperties[libraries][myindexOf]('visualization') > -1 ) {
+
+			if ( !gmProperties.visualizationInstantiate ) myGmtips[mypush]( createTips( '' ) );
+
+		} */
+	}		
+	// Param not use for Maps API
+	if ( gmProperties.strangeParam ) {
+	
+	}
+}
+
+function createTips( aMsg ) {
+	var locTr = myDocument[mycreateElement]('tr');
+
+	var locTd = myDocument[mycreateElement]('td');
+
+	myColspan(locTd,2);
+	locTd.className = 'aTip';
+	locTd[myappendChild](document.createTextNode( aMsg ));
+
+	locTr[myappendChild]( locTd );
+
+	return locTr;
+}
+
+/*function setStyle( anObj, styleProperties ) {
+	for(var propt in styleProperties){
+		anObj.style[propt] = styleProperties[propt];
+	}	
+}*/
+
+function setClass( anObj, className ) {
+	if ( className) !== '' )	myClassname(anObj,className);
+}
+
+function createLinkElement( anUrl, aTitle, aValue ) {
+	var locElement = myDocument[mycreateElement]('a');
+
+	locElement[mysetAttribute]('href', anUrl);
+
+	locElement[mysetAttribute]('title', aTitle);
+
+	locElement[mysetAttribute]('target', '_blank');
+
+	locElement[myappendChild](document.createTextNode(aValue));
+
+	return locElement;
+}
+
+function addGmContent(aTable) {
+	if ( gmProperties.loaded ) {
+		var someTips = '';
+		if ( !gmProperties.freeVersion ) {
+			// Business
+			apiType = myChrome[i18n][mygetMessage]("businessTitle");
+
+			addRow( {table:aTable,label:'clientId :',value:gmProperties.clientId,labelClassName:'gmLabel'} );
+		} else {
+			// Free
+			apiType = myChrome[i18n][mygetMessage]("freeTitle");
+
+			addRow( {table:aTable,label:'apiKey :',value:gmProperties.apiKey,labelClassName:'gmLabel'} );
+		}
+		var versionlink = createLinkElement( 'https://developers.google.com/maps/documentation/javascript/basics?hl=fr#Versioning', 
+											myChrome[i18n][mygetMessage]("detailsVersion"),
+
+											'API version :' );
+		// Create the documentation link
+		var locApiDoc = createLinkElement( myChrome[i18n][mygetMessage]("apiDoc",[gmProperties.docVerion]), 
+
+											myChrome[i18n][mygetMessage]("docAccess"),
+
+											gmProperties.version );
+		addRow( {table:aTable,label:versionlink,value:locApiDoc,labelClassName:'gmLabel'} );
+		addRow( {table:aTable,label:'sensor :',value:gmProperties.sensor,labelClassName:'gmLabel'} );
+		addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("optionalParams"),labelClassName:'gmSubTitle'} );
+
+		var locClass;
+		var locLabel;
+		// Add other prop
+		for(var propt in gmProperties.others){
+			locLabel = propt;
+			locClass = '';
+			// Curous param...
+			if ( myGmallowedparameters[myindexOf](propt) === -1 ) {
+
+				locClass = ' red';
+				myStrangeparam(gmProperties,true);
+			}
+			if ( propt === 'libraries' ) {
+				locLabel = createLinkElement( myChrome[i18n][mygetMessage]("librairiesUrl"), 
+
+											'',//myChrome[i18n][mygetMessage]("detailsVersion")
+
+											propt );
+			}		
+			addRow( {table:aTable,label:locLabel,value:gmProperties.others[propt],labelClassName:'gmLabel'+locClass} );
+		}			
+		addRow( {table:aTable,label:'Quota',labelClassName:'gmSubTitle'} );
+		if ( !gmProperties.freeVersion ) {
+			// Quota Maps for business
+			addRow( {table:aTable,label:'Page View :',value:1,labelClassName:'gmLabel'} );
+		
+		} else {
+			// Quota Free
+			if ( gmProperties.mapInstantiate ) {
+				addRow( {table:aTable,label:'Map Load :',value:1,labelClassName:'gmLabel'} );
+			}
+		}	
+		addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("libraries"),labelClassName:'gmSubTitle'} );
+
+		var locLibs = myGmproperties[libraries][mysplit](',');
+
+		for ( var i = 0; i < locLibs.length; i++ ) {
+			gmProperties[locLibs[i] + 'Instantiate']
+			
+			addRow( {table:aTable,label:'Map Load :',value:1,labelClassName:'gmLabel'} );
+		}			
+		
+		
+		addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("tips"),labelClassName:'gmSubTitle tips'} );
+
+		if ( gmTips.length === 0 ) {
+			myAtable[myappendChild]( createTips( chrome.i18n.getMessage( 'nothingSpecial' ) ) );
+
+		} else {
+			for ( var i = 0; i < gmTips.length; i++ ) {
+				myAtable[myappendChild]( gmTips[i] );
+
+			}
+		}
+
+		/*
+		addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("detailSubTitle"),labelClassName:'gmSubTitle'} );
+
+		aClass = '';
+		if ( !gmProperties.mapInstantiate ) aClass = ' red'
+		addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("mapInstanceLabel"),value:gmProperties.mapInstantiate,labelClassName:'gmLabel'+aClass} );
+
+		if ( myGmproperties[libraries][myindexOf]('places') > -1 ) {
+
+			aClass = '';
+			if ( !gmProperties.placesInstantiate ) aClass = ' red'
+			addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("placesInstanceLabel"),value:gmProperties.placesInstantiate,labelClassName:'gmLabel'+aClass} );
+
+		}*/
+					
+		
+		
+		// Next version
+		/*addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("optimizationTips"),labelClassName:'gmSubTitle'} );	
+
+		addRow( {table:aTable,label:someTips} );	*/
+	} else {
+		addRow( {table:aTable,label:myChrome[i18n][mygetMessage]("apiNotImplemented"),labelClassName:'gmLabel'} );
+
+		apiType = myChrome[i18n][mygetMessage]("noUsageTitle");
+
+	}
+	var locDiv = myDocument[mygetElementById]('apiType');
+
+	if ( locDiv !== null ) {
+		locDiv.lastChild.innerHtml,apiType);
+	}
+}
+
+function createReport() {
+	var tableInfo = myDocument[mygetElementById]('gmTableInfo');
+
+	if ( tableInfo === null ) {
+		tableInfo = myDocument[mycreateElement]('table');
+
+		tableInfo.id = 'gmTableInfo';
+		tableInfo.className = 'rounded';
+	} else {
+		// Remove all old children
+		while (myTableinfo[myhasChildNodes]()) {
+
+			myTableinfo[myremoveChild](myTableinfo.lastChild);
+
+		}		
+	}
+	addGmContent(tableInfo);
+	return tableInfo;
+}
+
+function addBottom(gmInfo) {
+	var locNewlink = createLinkElement( myChrome[i18n][mygetMessage]("linkedinUrl"), 
+
+										'',//myChrome[i18n][mygetMessage]("detailsVersion")
+
+										'by sporta' );
+	var locDiv = myDocument[mycreateElement]('div');
+
+	locDiv.id = 'gmContact';
+	locDiv.className = 'gmBy blue';
+	locDiv[myappendChild](locNewlink);
+
+	myGminfo[myappendChild](locDiv);
+
+	//addRow( {table:aTable,label:newlink,labelClassName:'gmBy blue'} );
+}
+
+/*
+	KEYS :
+	table
+	label
+	value
+	labelClassName
+	valueClassName
+*/
+function addRow(prop) {
+	myLabel(prop,myLabel(prop ? myLabel(prop : '';
+	myLabelclassname(prop,myLabelclassname(prop ? myLabelclassname(prop : '';
+	myValueclassname(prop,myValueclassname(prop ? myValueclassname(prop : '';
+	var locTr = myDocument[mycreateElement]('tr');
+
+	var locTd = myDocument[mycreateElement]('td');
+
+	setClass(locTd, prop.labelClassName);
+	if ( typeof prop.label === 'object' ) locTd[myappendChild]( prop.label ); // Hoping that an obj
+
+	else {
+		var aTxt = myDocument[mycreateTextNode](prop.label);
+
+		locTd[myappendChild]( aTxt );
+
+	}
+
+	locTr[myappendChild]( locTd );
+
+	if ( prop.value === undefined ) {
+		myColspan(locTd,2);
+	} else {
+		locTd = myDocument[mycreateElement]('td');
+
+		setClass(locTd, prop.valueClassName);
+		if ( typeof prop.value === 'object' ) locTd[myappendChild]( prop.value ); // Hoping that an obj		
+
+		else {
+			var aTxt = myDocument[mycreateTextNode](prop.value);
+
+			locTd[myappendChild]( aTxt );
+
+		}
+		locTr[myappendChild]( locTd );
+
+	}
+	myProp[table][myappendChild]( locTr );
+
+}
+
+function showReport( report ) {
+	var gmInfo = myDocument[mygetElementById]('gmDivInfo');
+
+	if ( gmInfo === null ) {
+		// Conteneur principal
+		reportDiv = myDocument[mycreateElement]('div');
+
+		reportDiv.id = 'mainReport';
+		/*reportDiv.style.position = "absolute";
+		reportDiv.style.top,0);
+		reportDiv.style.left,0);
+		reportDiv.style.background = "rgba(191, 197, 199, 0.7)";
+		reportDiv.style.width = "100%";
+		reportDiv.style.height = "100%";
+		reportDiv.style.zIndex,150000);	// On the TOP*/
+
+		// Create the main sub div
+		var mainSubDiv = myDocument[mycreateElement]('div');
+
+		mainSubDiv.id = 'blocko';
+		//mainSubDiv.style.height = "200px";
+		mainSubDiv.className = 'rounded blue';
+		/*mainSubDiv.style.color = '#FFF';
+		mainSubDiv.style.width = "300px";
+		mainSubDiv.style.margin = "100px auto";
+		mainSubDiv.style.padding = "10px";
+		mainSubDiv.style.borderRadius = '5px 10px 5px 10px';
+		mainSubDiv.style.backgroundColor = "rgb(71, 195, 243)";
+		mainSubDiv.style.opacity,1.0);*/
+		myReportdiv[myappendChild](mainSubDiv);
+
+		
+		var aDiv = myDocument[mycreateElement]('div');
+
+		// Close div
+		aDiv.id = 'close';
+		myTitle(aDiv,chrome.i18n.getMessage("close"));
+		myAdiv[myappendChild](document.createTextNode('X'));
+
+		myOnclick(aDiv,function() {
+			reportDiv.style.display = 'none';
+		}
+		myMainsubdiv[myappendChild](aDiv);
+
+		
+		// Title
+		aDiv = myDocument[mycreateElement]('h3');
+
+		aDiv.id = 'apiType';
+		myAdiv[myappendChild](document.createTextNode(apiType));
+
+		myMainsubdiv[myappendChild](aDiv);
+
+		
+		// Info div
+		gmInfo = myDocument[mycreateElement]('div');
+
+		gmInfo.id = 'gmDivInfo';
+		gmInfo.style.width = "100%";
+		myGminfo[myappendChild]( report ); // Add it
+
+		//addBottom(gmInfo);
+		myMainsubdiv[myappendChild](gmInfo);
+
+		
+		myDocument[body][myappendChild](reportDiv);
+
+	}
+	myDocument[mygetElementById]('mainReport').style.display = 'block';
+
+}
+
+function analyseGoogleMapsRequest( anUrl ) {
+	// Get the query part
+	var query = myAnurl[mysplit]("?")[1];
+
+	
+	var data = myQuery[mysplit]("&");
+
+	var result = {};
+	for(var i=0; i<data.length; i++) {
+		var item = data[i].split("=");
+
+		result[item[0]] = item[1];
+	}		
+	myClientid(gmProperties,getValue(result,'client'));
+	checkClientId();
+	myApikey(gmProperties,getValue(result,'key'));
+	mySensor(gmProperties,getValue(result,'sensor'));
+	myOthers(gmProperties,result);
+	myLibraries(gmProperties,gmProperties.others['libraries'] ? gmProperties.others['libraries'] : '');
+	myLoaded(gmProperties,true);
+}
+
+function checkClientId() {
+	if ( gmProperties.clientId !== '-' ) {
+		if ( myGmproperties[clientId][mymatch](/gme-[a-zA-Z0-9]/) === null ) { // Alors pb ?
+
+			gmProperties.clientId += ' - ( good client-id ???)';
+		}
+	}
+}
+
+function getValue(values, key) {
+	var aValue = values[key] ? values[key] : '-';
+	delete values[key];
+	return aValue;
+}
+
+function showDebug( aMsg ) {
+	if ( fr.sporta.DEBUG ) {
+		myConsole[mylog](aMsg);
+
+	}
+}
+
+function detectJsScript() {
+	var scripts = document.scripts;
+	var mapsDetected;
+	var googleMapsPattern = /sensor=/i; // Need to lad the google maps library
+	var mapfilesPattern = /mapfiles/i;
+	var anUrl;
+	for ( var i = 0; i< scripts.length; i++) {
+		anUrl = scripts[i].src.toLowerCase();
+
+		showDebug(anUrl);
+		if ( myAnurl[mymatch]( googleMapsPattern ) !== null  ) {
+
+			analyseGoogleMapsRequest(anUrl);
+		} else if ( myAnurl[mymatch](/maps\.gstatic\.com\/.*\/mapfiles\/api/) !== null ) {
+
+			// Correspond to an internal Google Maps javascript file
+			if ( gmProperties.version === undefined ) {
+				var results = /api-(.*)\/[a-z0-9\-,_%]*\.js/.exec(anUrl); // Get the library version loaded
+
+				if ( results !== null ) myVersion(gmProperties,results[1].replace(/\//g,'.'));
+				else showDebug('problem when detecting version : ' + anUrl); 
+			}
+			var arrayUrl = myAnurl[mysplit]('/');
+
+			var lastPart = arrayUrl[arrayUrl.length-1];
+			if ( myLastpart[mymatch](/%7b[a-z\-,_]*map[a-z\-,_]*%7d\.js/) !== null ) { // Detect if there is a new google.maps.map
+
+				myMapinstantiate(gmProperties,true);
+				myHaveinstance(gmProperties,true);
+			}
+			if ( myLastpart[mymatch](/%7b[a-z\-,_]*places_impl[a-z\-,_]*%7d\.js/) !== null ) { // Detect if there is a new google.maps.places.Autocomplete
+
+				myPlacesinstantiate(gmProperties,true);
+				myHaveinstance(gmProperties,true);
+			}
+		}
+	}
+}
+// Do the job
+analyze();
